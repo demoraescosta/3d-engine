@@ -53,12 +53,14 @@ int main(int argc, char** argv)
     float scale_factor = 0.2;
     RenderTexture2D renderTexture = LoadRenderTexture((int)(scr_width * scale_factor), (int)(scr_height * scale_factor));
 
+    
+
     InitWindow(scr_width, scr_height, "3d renderer");
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
-        float angle = 1.0f * GetTime();    
+        f32 angle = 1.0f * GetTime();
 
         mat4x4 rotation_mat_x, rotation_mat_z;
 

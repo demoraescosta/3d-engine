@@ -16,21 +16,34 @@ typedef struct mat4x4
     f64 m[4][4];
 } mat4x4;
 
+// --------------
+// vector stuff
+// --------------
+
+void vec2d_scale(vec2d* v, f32 factor);
 
 // --------------
 // matrix stuff
 // --------------
 
+// get rotation matrix from axis and angle
+mat4x4 mat4x4_rotation(vec3d axis, f32 angle);
 
-void matrix_scale(mat4x4* m, f32 factor);
-void matrix_rotate(mat4x4* m, f32 factor);
+// get x-rotation matrix
+mat4x4 mat4x4_rotation_X(f32 angle);
 
+// get y-rotation matrix
+mat4x4 mat4x4_rotation_Y(f32 angle);
+
+// get z-rotation matrix
+mat4x4 mat4x4_rotation_Z(f32 angle);
+
+// -----------------------------
+// matrix / vec arithmetic
+// -----------------------------
 
 // takes input (vec3d) i, multiplies it by matrix (mat4x4) m and outputs to buffer (vec3d) o
 void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o);
-
-// initializes all matrix values to zero
-mat4x4 mat4x4_initialize(void);
 
 // ---------
 // tri stuff
