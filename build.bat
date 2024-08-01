@@ -1,1 +1,0 @@
-compiledb -n make all | make run
