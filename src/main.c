@@ -50,17 +50,15 @@ int main(int argc, char** argv)
     // rendering
     // --------------------
 
-    float scale_factor = 0.2;
-    RenderTexture2D renderTexture = LoadRenderTexture((int)(scr_width * scale_factor), (int)(scr_height * scale_factor));
-
-    
-
     InitWindow(scr_width, scr_height, "3d renderer");
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
-        f32 angle = 1.0f * GetTime();
+        f32 dt = GetFrameTime();
+        f32 elapsed_time = GetTime();
+
+        f32 angle = 1.0f * elapsed_time;
 
         mat4x4 rotation_mat_x, rotation_mat_z;
 
@@ -99,44 +97,30 @@ int main(int argc, char** argv)
                 tri tri_translated;
 
                 // rotate tris
-                // z axis
-
-                multiply_vec_by_mat(&t.p[0], &rotation_mat_z, &tri_rotated_z.p[0]);
-                multiply_vec_by_mat(&t.p[1], &rotation_mat_z, &tri_rotated_z.p[1]);
-                multiply_vec_by_mat(&t.p[2], &rotation_mat_z, &tri_rotated_z.p[2]);
-
-                // add x axis
-
-                multiply_vec_by_mat(&tri_rotated_z.p[0], &rotation_mat_x, &tri_rotated_zx.p[0]);
-                multiply_vec_by_mat(&tri_rotated_z.p[1], &rotation_mat_x, &tri_rotated_zx.p[1]);
-                multiply_vec_by_mat(&tri_rotated_z.p[2], &rotation_mat_x, &tri_rotated_zx.p[2]);
+                tri_rotate_m(&t, &rotation_mat_z, &tri_rotated_z);
+                tri_rotate_m(&tri_rotated_z, &rotation_mat_x, &tri_rotated_zx);
 
                 // offset into screen
 
-                tri_translated = tri_rotated_zx;
-
-                tri_translated.p[0].z = tri_rotated_zx.p[0].z + 3.0f;
-                tri_translated.p[1].z = tri_rotated_zx.p[1].z + 3.0f;
-                tri_translated.p[2].z = tri_rotated_zx.p[2].z + 3.0f;
+                tri_translate_xyz(&tri_rotated_zx, 0, 0, 2.0f, &tri_translated);
 
                 // projection
 
                 multiply_vec_by_mat(&tri_translated.p[0], &projection_matrix, &tri_projected.p[0]);
                 multiply_vec_by_mat(&tri_translated.p[1], &projection_matrix, &tri_projected.p[1]);
-                multiply_vec_by_mat(&tri_translated.p[2], &projection_matrix, &tri_projected.p[2]);                
+                multiply_vec_by_mat(&tri_translated.p[2], &projection_matrix, &tri_projected.p[2]);
 
                 // scale cube
 
-                tri_projected.p[0].x += 1.0f; tri_projected.p[0].y += 1.0f; 
-                tri_projected.p[1].x += 1.0f; tri_projected.p[1].y += 1.0f; 
-                tri_projected.p[2].x += 1.0f; tri_projected.p[2].y += 1.0f; 
+                tri_translate_xyz(&tri_projected, 1.0f, 1.0f, 0.0f, &tri_projected);
 
-                tri_projected.p[0].x *= 0.5f * (float)scr_width; 
-                tri_projected.p[0].y *= 0.5f * (float)scr_height; 
-                tri_projected.p[1].x *= 0.5f * (float)scr_width; 
-                tri_projected.p[1].y *= 0.5f * (float)scr_height; 
-                tri_projected.p[2].x *= 0.5f * (float)scr_width; 
-                tri_projected.p[2].y *= 0.5f * (float)scr_height; 
+                vec3d scale_vector;
+
+                scale_vector.x = 0.5f * (float)scr_width;
+                scale_vector.y = 0.5f * (float)scr_height;
+                scale_vector.z = 1.0f;
+
+                tri_scale_v(&tri_projected, scale_vector, &tri_projected);
 
                 // draw tri
                 tri_draw(tri_projected);
