@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
         f32 angle = 1.0f * elapsed_time;
 
-        float mwheel = (float)(GetMouseWheelMove()*2.5f);
+        float mwheel = (float)(GetMouseWheelMove()*2.0f);
 
         v.fov -= mwheel;
         

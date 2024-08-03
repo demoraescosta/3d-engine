@@ -24,4 +24,4 @@ In an [MSYS2](https://www.msys2.org/) terminal, run:
     make build 
     make run
 
-```make all``` will also generate a ```compile_commands.json``` file that can be used by a clangd language server. ```make compiledb``` will generate the same file without building.
+Alternatively, ```make all``` will also generate a ```compile_commands.json``` file that can be used by a clangd language server. ```make compiledb``` will generate the same file without building.
