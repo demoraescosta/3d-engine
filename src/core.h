@@ -11,22 +11,9 @@
 typedef Vector2 vec2d;
 typedef Vector3 vec3d;
 
-typedef struct 
-{
-    f64 m[4][4];
-} mat4x4;
+typedef struct mat4x4 mat4x4;
 
-typedef struct 
-{
-    f32 fov; 
-    f32 fov_rad;       // fov in radians
-    f32 aspect_ratio;
-
-    f32 far_plane;     // furthest point from viewport
-    f32 near_plane;    // nearest point from viewport
-
-    mat4x4 projection_matrix;
-} viewport;
+typedef struct viewport viewport;
 
 // --------------
 // vector stuff
@@ -44,15 +31,19 @@ void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o);
 // --------------
 // matrix stuff
 // --------------
+typedef struct mat4x4
+{
+    f64 m[4][4];
+} mat4x4;
 
-// get x-rotation matrix
-mat4x4 mat4x4_rotation_X(f32 angle);
+// generate x-rotation matrix
+mat4x4 matrix_rotation_X(f32 angle); 
 
-// get y-rotation matrix
-mat4x4 mat4x4_rotation_Y(f32 angle);
+// generate y-rotation matrix
+mat4x4 matrix_rotation_Y(f32 angle);
 
-// get z-rotation matrix
-mat4x4 mat4x4_rotation_Z(f32 angle);
+// generate z-rotation matrix
+mat4x4 matrix_rotation_Z(f32 angle);
 
 // multiply matrix (mat4x4*) x by matrix (mat4x4*) y and outputs to buffer (mat4x4*) o
 mat4x4 matrix_multiplication(mat4x4* x, mat4x4* y, mat4x4* o);
@@ -61,7 +52,7 @@ mat4x4 matrix_multiplication(mat4x4* x, mat4x4* y, mat4x4* o);
 // tri stuff
 // ---------
 
-typedef struct
+typedef struct tri
 {
     vec3d p[3]; // points
 } tri;
@@ -73,15 +64,13 @@ void tri_scale(tri* t, f32 factor, tri* o);
 
 void tri_scale_v(tri* t, vec3d vector, tri* o);
 
-void tri_project(tri* t, mat4x4* pm, tri* o);
+void tri_project(tri t, viewport* v, tri* o);
 
-void tri_rotate_m(tri* t, mat4x4* rm, tri* o);
+void tri_rotate_m(tri t, mat4x4* rm, tri* o);
 
-void tri_rotate_v(tri* t, vec3d rotation_vector, tri* o);
+void tri_translate(tri t, vec3d vector, tri* o);
 
-void tri_translate(tri* t, vec3d vector, tri* o);
-
-void tri_translate_xyz(tri* t, f32 x, f32 y, f32 z, tri* o);
+void tri_translate_xyz(tri t, f32 x, f32 y, f32 z, tri* o);
 
 // ----------
 // mesh stuff

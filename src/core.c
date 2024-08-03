@@ -30,40 +30,44 @@ void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o)
 // get x-rotation matrix
 mat4x4 matrix_rotation_X(f32 angle)
 {
-    mat4x4 rotation_mat = { 0 };
+    mat4x4 rotation_mat = 
+    { 
+        1,     0,            0,            0,
+        0, cosf(angle), -sinf(angle),      0,
+        0, sinf(angle), cosf(angle),       0,
 
-    rotation_mat.m[0][0] = 1;
-    rotation_mat.m[1][1] = cosf(angle * 0.5f);
-    rotation_mat.m[1][2] = sinf(angle * 0.5f);
-    rotation_mat.m[2][1] = -sinf(angle * 0.5f);
-    rotation_mat.m[2][2] = cosf(angle * 0.5f);
-    rotation_mat.m[3][3] = 1;
-
+        0,0,0,0,
+    };
+    
     return rotation_mat;
 }
 
 // get y-rotation matrix
 mat4x4 matrix_rotation_Y(f32 angle)
 {
-    (void)angle;
+    mat4x4 rotation_mat = 
+    {
+         cosf(angle), 0,  sinf(angle),    0,
+              0,      1,       0,         0,
+        -sinf(angle), 0,  cosf(angle),    0,
 
-    // TODO: unimplemented
+        0,0,0,0
+    };
 
-    mat4x4 m = { 0 };
-    return m;
+    return rotation_mat;
 }
 
 // get z-rotation matrix
 mat4x4 matrix_rotation_Z(f32 angle)
 {
-    mat4x4 rotation_mat = { 0 };
+    mat4x4 rotation_mat = 
+    { 
+        cosf(angle), -sinf(angle), 0,   0,
+        sinf(angle),  cosf(angle), 0,   0,
+              0,           0,      1,   0,
 
-    rotation_mat.m[0][0] = cosf(angle);
-    rotation_mat.m[0][1] = sinf(angle);
-    rotation_mat.m[1][0] = -sinf(angle);
-    rotation_mat.m[1][1] = cosf(angle);
-    rotation_mat.m[2][2] = 1;
-    rotation_mat.m[3][3] = 1;
+        0,0,0,0
+    };
 
     return rotation_mat;
 }
@@ -118,18 +122,27 @@ void tri_scale_v(tri* t, vec3d vector, tri* o)
     }
 }
 
-void tri_project(tri* t, mat4x4* pm, tri* o)
-{
-    multiply_vec_by_mat(&t->p[0], pm, &o->p[0]);
-    multiply_vec_by_mat(&t->p[1], pm, &o->p[1]);
-    multiply_vec_by_mat(&t->p[2], pm, &o->p[2]);
-}
+// void tri_project(tri t, viewport* v, tri* o)
+// {
+//     // mat4x4 projection_matrix = { 0 };
 
-void tri_rotate_m(tri* t, mat4x4* rm, tri* o)
+//     // v->projection_matrix.m[0][0] = v->aspect_ratio * v->fov_rad;
+//     // v->projection_matrix.m[1][1] = v->fov_rad;
+//     // v->projection_matrix.m[2][2] = v->far_plane / (v->far_plane - v->near_plane);
+//     // v->projection_matrix.m[3][2] = (-v->far_plane * v->near_plane) / (v->far_plane - v->near_plane);
+//     // v->projection_matrix.m[2][3] = 1.0f;
+//     // v->projection_matrix.m[3][3] = 0.0f;
+
+//     // multiply_vec_by_mat(&t.p[0], pm, &o->p[0]);
+//     // multiply_vec_by_mat(&t.p[1], pm, &o->p[1]);
+//     // multiply_vec_by_mat(&t.p[2], pm, &o->p[2]);
+// }
+
+void tri_rotate_m(tri t, mat4x4* rm, tri* o)
 {
-    multiply_vec_by_mat(&t->p[0], rm, &o->p[0]);
-    multiply_vec_by_mat(&t->p[1], rm, &o->p[1]);
-    multiply_vec_by_mat(&t->p[2], rm, &o->p[2]);
+    multiply_vec_by_mat(&t.p[0], rm, &o->p[0]);
+    multiply_vec_by_mat(&t.p[1], rm, &o->p[1]);
+    multiply_vec_by_mat(&t.p[2], rm, &o->p[2]);
 }
 
 void tri_rotate_v(tri* t, vec3d rotation_vector, tri* o)
@@ -152,7 +165,7 @@ void tri_rotate_v(tri* t, vec3d rotation_vector, tri* o)
         rotation_mat_x.m[2][2] = cosf(angle_x * 0.5f);
         rotation_mat_x.m[3][3] = 1;
 
-        tri_rotate_m(t, &rotation_mat_x, o);
+        tri_rotate_m(*t, &rotation_mat_x, o);
     }
 
     // rotation on the z axis
@@ -167,38 +180,28 @@ void tri_rotate_v(tri* t, vec3d rotation_vector, tri* o)
 		rotation_mat_z.m[2][2] = 1;
 		rotation_mat_z.m[3][3] = 1;
 
-        tri_rotate_m(t, &rotation_mat_z, o);
+        tri_rotate_m(*t, &rotation_mat_z, o);
     }
 }
 
-void tri_translate(tri* t, vec3d vector, tri* o)
+void tri_translate(tri t, vec3d vector, tri* o)
 {
-    o->p[0].x = t->p[0].x + vector.x;
-    o->p[1].x = t->p[1].x + vector.x;
-    o->p[2].x = t->p[2].x + vector.x;
-
-    o->p[0].y = t->p[0].y + vector.y;
-    o->p[1].y = t->p[1].y + vector.y;
-    o->p[2].y = t->p[2].y + vector.y;
-
-    o->p[0].z = t->p[0].z + vector.z;
-    o->p[1].z = t->p[1].z + vector.z;
-    o->p[2].z = t->p[2].z + vector.z;
+    for (uint i = 0; i < 3; i += 1)
+    {
+        o->p[i].x = t.p[i].x + vector.x;
+        o->p[i].y = t.p[i].y + vector.y;
+        o->p[i].z = t.p[i].z + vector.z;
+    }    
 }
 
-void tri_translate_xyz(tri* t, f32 x, f32 y, f32 z, tri* o)
+void tri_translate_xyz(tri t, f32 x, f32 y, f32 z, tri* o)
 {
-    o->p[0].x = t->p[0].x + x;
-    o->p[1].x = t->p[1].x + x;
-    o->p[2].x = t->p[2].x + x;
-
-    o->p[0].y = t->p[0].y + y;
-    o->p[1].y = t->p[1].y + y;
-    o->p[2].y = t->p[2].y + y;
-
-    o->p[0].z = t->p[0].z + z;
-    o->p[1].z = t->p[1].z + z;
-    o->p[2].z = t->p[2].z + z;
+    for (uint i = 0; i < 3; i += 1)
+    {
+        o->p[i].x = t.p[i].x + x;
+        o->p[i].y = t.p[i].y + y;
+        o->p[i].z = t.p[i].z + z;
+    }
 }
 
 // ----------

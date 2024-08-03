@@ -70,14 +70,6 @@ int main(int argc, char** argv)
 		rotation_mat_z.m[2][2] = 1;
 		rotation_mat_z.m[3][3] = 1;
 
-		// rotation on the x axis
-		rotation_mat_x.m[0][0] = 1;
-		rotation_mat_x.m[1][1] = cosf(angle * 0.5f);
-		rotation_mat_x.m[1][2] = sinf(angle * 0.5f);
-		rotation_mat_x.m[2][1] = -sinf(angle * 0.5f);
-		rotation_mat_x.m[2][2] = cosf(angle * 0.5f);
-		rotation_mat_x.m[3][3] = 1;
-
         // ---------------
         // drawing
         // ---------------
@@ -93,16 +85,21 @@ int main(int argc, char** argv)
 
                 tri tri_rotated_z, tri_rotated_x;
                 tri tri_rotated_zx;
+                tri tri_rotated_zxy;
 
                 tri tri_translated;
 
                 // rotate tris
-                tri_rotate_m(&t, &rotation_mat_z, &tri_rotated_z);
-                tri_rotate_m(&tri_rotated_z, &rotation_mat_x, &tri_rotated_zx);
+
+                mat4x4 rotation_mat_x = matrix_rotation_X(angle);
+                mat4x4 rotation_mat_z = matrix_rotation_Z(angle);
+
+                tri_rotate_m(t, &rotation_mat_z, &t);
+                tri_rotate_m(t, &rotation_mat_x, &t);
 
                 // offset into screen
 
-                tri_translate_xyz(&tri_rotated_zx, 0, 0, 2.0f, &tri_translated);
+                tri_translate_xyz(t, 0, 0, 2.0f, &tri_translated);
 
                 // projection
 
@@ -112,7 +109,7 @@ int main(int argc, char** argv)
 
                 // scale cube
 
-                tri_translate_xyz(&tri_projected, 1.0f, 1.0f, 0.0f, &tri_projected);
+                tri_translate_xyz(tri_projected, 1.0f, 1.0f, 0.0f, &tri_projected);
 
                 vec3d scale_vector;
 
