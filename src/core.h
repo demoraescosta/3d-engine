@@ -8,6 +8,18 @@
 
 #define COUNT_OF(arr) (size_t)(sizeof(arr)/sizeof(arr[0]))
 
+// dynamic array
+typedef struct arr {
+    void** data;
+    size_t count;
+    size_t size;
+
+    size_t num_allocated;
+    size_t num_elements;
+} arr;
+
+void arr_append(arr* arr, void* data);
+
 // text drawing
 
 static Font GLOBAL_FONT;
@@ -26,8 +38,6 @@ typedef Vector3 vec3d;
 typedef struct mat4x4 mat4x4;
 
 typedef struct viewport viewport;
-
-
 
 // -----------------------------------------------------------------------------
 // vector stuff
@@ -98,5 +108,10 @@ typedef struct mesh
 
 void _mesh_print(mesh mesh, const char* mesh_name);
 mesh mesh_cube(void);
+
+void mesh_scale(mesh* m, f32 factor);
+
+// render mesh to viewport v
+void mesh_render(mesh* mesh, viewport* v);
 
 #define mesh_print(mesh) _mesh_print(mesh, #mesh)

@@ -41,9 +41,12 @@ int main(int argc, char** argv)
     projection_matrix.m[2][3] = 1.0f;
     projection_matrix.m[3][3] = 0.0f;
 
-    viewport v = { 0 };
+    viewport v = 
+    { 
+        0
+    };
 
-    viewport_update(&v, fov, aspect_ratio, far_plane, near_plane);
+    viewport_create(&v, fov, aspect_ratio, far_plane, near_plane);
 
     // -------------------------------------------------------------------------
     // rendering
@@ -51,18 +54,22 @@ int main(int argc, char** argv)
 
     InitWindow(scr_width, scr_height, "3d renderer");
 
-    GLOBAL_FONT = LoadFont(TextFormat("%s%s", dir, "\\res\\c64_2.ttf"));
+    GLOBAL_FONT = LoadFont(TextFormat("%s%s", dir, "/res/petme/PetMe64.ttf"));
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
-        viewport_update(&v, fov, aspect_ratio, far_plane, near_plane);
+        viewport_update(&v);
 
         f32 dt = GetFrameTime();
         f32 elapsed_time = GetTime();
 
         f32 angle = 1.0f * elapsed_time;
+
+        float mwheel = (float)(GetMouseWheelMove()*2.5f);
+
+        v.fov -= mwheel;
         
         // ---------------------------------------------------------------------
         // drawing

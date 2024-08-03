@@ -269,3 +269,17 @@ void _mesh_print(mesh m, const char* mesh_name)
     }
 }
 
+void mesh_render(mesh* mesh, viewport* v)
+{
+    for (size_t i = 0; i < mesh->tri_count; i++)
+    {
+        tri t = mesh->tris[i];
+        tri tri_projected;
+
+        // projection
+        tri_project(t, v, &tri_projected);
+
+        // draw tri
+        tri_draw(tri_projected);
+    }
+}
