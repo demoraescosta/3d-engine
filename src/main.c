@@ -9,32 +9,27 @@
 #include <string.h>
 
 #include "core.h"
+#include "viewport.h"
 
 int main(int argc, char** argv)
 {
     (void)argc; (void)argv;
 
+    const char* dir = GetWorkingDirectory();
+
     const u32 scr_width = 1200;
     const u32 scr_height = 800;
 
-    // sample cube
     const mesh test_cube = mesh_cube();
     
     mesh_print(test_cube);
 
-    // ----------------
-    //  sorcery 
-    // ----------------
-
-    f32 near_plane =   0.10f;
-    f32 far_plane  = 1000.0f;
-
     f32 fov = 90.0f;
-
     f32 aspect_ratio = (f32)scr_height / (f32)scr_width;
-
-    // fov in radians 
     f32 fov_rad = (1.0f / tanf(fov * 0.5f / 180.0f * PI));
+    
+    f32 far_plane  = 1000.0f;
+    f32 near_plane =   0.10f;
 
     mat4x4 projection_matrix;
     memset(&projection_matrix, 0, sizeof(mat4x4)); 
@@ -46,36 +41,43 @@ int main(int argc, char** argv)
     projection_matrix.m[2][3] = 1.0f;
     projection_matrix.m[3][3] = 0.0f;
 
-    // --------------------
+    viewport v = { 0 };
+
+    viewport_update(&v, fov, aspect_ratio, far_plane, near_plane);
+
+    // -------------------------------------------------------------------------
     // rendering
-    // --------------------
+    // -------------------------------------------------------------------------
 
     InitWindow(scr_width, scr_height, "3d renderer");
+
+    GLOBAL_FONT = LoadFont(TextFormat("%s%s", dir, "\\res\\c64_2.ttf"));
+
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
+        viewport_update(&v, fov, aspect_ratio, far_plane, near_plane);
+
         f32 dt = GetFrameTime();
         f32 elapsed_time = GetTime();
 
         f32 angle = 1.0f * elapsed_time;
-
-        mat4x4 rotation_mat_x, rotation_mat_z;
-
-        // rotation on the z axis
-        rotation_mat_z.m[0][0] = cosf(angle);
-		rotation_mat_z.m[0][1] = sinf(angle);
-		rotation_mat_z.m[1][0] = -sinf(angle);
-		rotation_mat_z.m[1][1] = cosf(angle);
-		rotation_mat_z.m[2][2] = 1;
-		rotation_mat_z.m[3][3] = 1;
-
-        // ---------------
+        
+        // ---------------------------------------------------------------------
         // drawing
-        // ---------------
+        // ---------------------------------------------------------------------
 
         BeginDrawing();
             ClearBackground(BLACK);
+
+            draw_text(TextFormat("fps: %d", GetFPS()),   16, 16, 16, WHITE);
+            draw_text(TextFormat("%.2fs", elapsed_time),  16, 32, 16, WHITE);
+            draw_text(TextFormat("ft: %.2fms", dt*1000), 16, 48, 16, WHITE);
+            draw_text(TextFormat("viewport data:\n fov: %.1f\n fov rad: %.1f \n near plane: %.2f \n far plane: %.2f", 
+                                  v.fov, v.fov_rad, v.near_plane, v.far_plane), 
+                                  16, 96, 16, WHITE);
+
 
             // draw cube mesh
             for (size_t i = 0; i < test_cube.tri_count; i++)
@@ -83,14 +85,7 @@ int main(int argc, char** argv)
                 tri t = test_cube.tris[i];
                 tri tri_projected;
 
-                tri tri_rotated_z, tri_rotated_x;
-                tri tri_rotated_zx;
-                tri tri_rotated_zxy;
-
-                tri tri_translated;
-
                 // rotate tris
-
                 mat4x4 rotation_mat_x = matrix_rotation_X(angle);
                 mat4x4 rotation_mat_z = matrix_rotation_Z(angle);
 
@@ -98,17 +93,12 @@ int main(int argc, char** argv)
                 tri_rotate_m(t, &rotation_mat_x, &t);
 
                 // offset into screen
-
-                tri_translate_xyz(t, 0, 0, 2.0f, &tri_translated);
+                tri_translate_xyz(t, 0, 0, 2.0f, &t);
 
                 // projection
-
-                multiply_vec_by_mat(&tri_translated.p[0], &projection_matrix, &tri_projected.p[0]);
-                multiply_vec_by_mat(&tri_translated.p[1], &projection_matrix, &tri_projected.p[1]);
-                multiply_vec_by_mat(&tri_translated.p[2], &projection_matrix, &tri_projected.p[2]);
+                tri_project(t, &v, &tri_projected);
 
                 // scale cube
-
                 tri_translate_xyz(tri_projected, 1.0f, 1.0f, 0.0f, &tri_projected);
 
                 vec3d scale_vector;
@@ -126,6 +116,7 @@ int main(int argc, char** argv)
         EndDrawing();
     }
 
+    UnloadFont(GLOBAL_FONT);
     CloseWindow();
     
     return 0;

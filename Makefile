@@ -13,7 +13,8 @@ CFLAGS = -Wall -Wextra -pedantic -c -g \
 		 -Wno-reserved-identifier \
 		 -Wno-missing-braces \
 		 -Wno-unused-variable \
-		 -Wno-sizeof-pointer-div
+		 -Wno-sizeof-pointer-div \
+		 -Wno-unused-includes
 
 # include dir
 CFLAGS += -Iinclude/
@@ -36,7 +37,7 @@ OBJ := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 
 REMOVE_CMD := del /f /q
 
-all: clean dir $(BUILD_DIR)/$(EXEC) compiledb
+all: dir $(BUILD_DIR)/$(EXEC) compiledb
 
 dir:
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)

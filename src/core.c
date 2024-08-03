@@ -7,6 +7,8 @@
 
 #include <raylib.h>
 
+#include "viewport.h"
+
 // --------------------
 // matrix stuff
 // --------------------
@@ -137,6 +139,13 @@ void tri_scale_v(tri* t, vec3d vector, tri* o)
 //     // multiply_vec_by_mat(&t.p[1], pm, &o->p[1]);
 //     // multiply_vec_by_mat(&t.p[2], pm, &o->p[2]);
 // }
+
+void tri_project(tri t, viewport *v, tri *o)
+{
+    multiply_vec_by_mat(&t.p[0], &v->projection_matrix, &o->p[0]);
+    multiply_vec_by_mat(&t.p[1], &v->projection_matrix, &o->p[1]);
+    multiply_vec_by_mat(&t.p[2], &v->projection_matrix, &o->p[2]);
+}
 
 void tri_rotate_m(tri t, mat4x4* rm, tri* o)
 {
