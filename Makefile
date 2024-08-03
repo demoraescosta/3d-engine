@@ -37,7 +37,9 @@ OBJ := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 
 REMOVE_CMD := del /f /q
 
-all: dir $(BUILD_DIR)/$(EXEC) compiledb
+all: dir build compiledb
+
+build: dir $(BUILD_DIR)/$(EXEC)
 
 dir:
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
