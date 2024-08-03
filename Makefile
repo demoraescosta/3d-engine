@@ -41,8 +41,13 @@ all: dir build compiledb
 
 build: dir $(BUILD_DIR)/$(EXEC)
 
+ifeq ($(OS), Windows_NT)
 dir:
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+else
+dir:
+	mkdir -p $(BUILD_DIR)
+endif
 
 $(BUILD_DIR)/$(EXEC): $(OBJ)
 	$(CC) $^ -o $@ $(LFLAGS)
