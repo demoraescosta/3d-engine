@@ -7,18 +7,8 @@
 #include <raymath.h>
 
 #define COUNT_OF(arr) (size_t)(sizeof(arr)/sizeof(arr[0]))
-
-// dynamic array
-typedef struct arr {
-    void** data;
-    size_t count;
-    size_t size;
-
-    size_t num_allocated;
-    size_t num_elements;
-} arr;
-
-void arr_append(arr* arr, void* data);
+#undef bool
+typedef unsigned char bool;
 
 // text drawing
 
@@ -49,7 +39,7 @@ void vec2d_scale(vec2d* v, f32 factor);
 // multiply vec2d by vec2d
 void vec2d_multiply(vec2d *v, f32 factor);
 
-// takes input (vec3d) i, multiplies it by matrix (mat4x4) m and outputs to buffer (vec3d) o
+// takes input (vec3d) i, multiplies it by matrix (mat4x4) m and outputs to buffer (vec3d) "o"
 void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o);
 
 // -----------------------------------------------------------------------------
@@ -84,16 +74,27 @@ typedef struct tri
 void tri_print(tri t);
 void tri_draw(tri t);
 
+// scale triangle by "factor" (f32) and outputs the scaled triangle into tri (tri*) "o"
 void tri_scale(tri* t, f32 factor, tri* o);
 
+// scale triangle using a "vector" for each position and outputs the scaled triangle into tri (tri*) "o"
 void tri_scale_v(tri* t, vec3d vector, tri* o);
 
+// flattens triangle "t" (tri) using viewport "v" (viewport*) data and outputs the
+// projected triangle into tri (tri*) "o"
 void tri_project(tri t, viewport* v, tri* o);
 
+// this is temporary, will replace with an actual rotation function later™
 void tri_rotate_m(tri t, mat4x4* rm, tri* o);
 
+// this is temporary, will replace with an actual rotation function later™
+void tri_rotate_m(tri t, mat4x4* rm, tri* o);
+
+// translate by vector (vec3d) and outputs the translated triangle into tri (tri*) "o"
 void tri_translate(tri t, vec3d vector, tri* o);
 
+// translate triangle "t" (tri) by specified coordinates (f32) and outputs the 
+// translated triangle into tri (tri*) "o" 
 void tri_translate_xyz(tri t, f32 x, f32 y, f32 z, tri* o);
 
 // -----------------------------------------------------------------------------
@@ -106,12 +107,14 @@ typedef struct mesh
     size_t tri_count;
 } mesh;
 
+// internal: prints every tri's x, y, z position of given mesh "mesh"
 void _mesh_print(mesh mesh, const char* mesh_name);
 mesh mesh_cube(void);
 
 void mesh_scale(mesh* m, f32 factor);
 
-// render mesh to viewport v
+// render mesh to viewport (viewport*) "v"
 void mesh_render(mesh* mesh, viewport* v);
 
-#define mesh_print(mesh) _mesh_print(mesh, #mesh)
+// prints every tri's x, y, z position of given mesh (mesh) "m"
+#define mesh_print(m) _mesh_print(m, #m)

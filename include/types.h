@@ -9,6 +9,7 @@
 // and also i think it looks neat <|:)
 
 #include <stdint.h>
+#include <stddef.h>
 #include <float.h>
 #include <limits.h>
 

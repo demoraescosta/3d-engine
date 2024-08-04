@@ -21,7 +21,7 @@ Very much unfinished and weird.
 
 This guide assumes an [MSYS2](https://www.msys2.org/) UCRT64 environment.
 
-#### Installing depedencies for Windows
+### Installing depedencies for Windows
 
 In an [MSYS2](https://www.msys2.org/) UCRT64 terminal, run:
 
@@ -37,14 +37,11 @@ In a Powershell terminal with [administrator privileges](https://github.com/gera
 
 ### Debian
 
-#### Installing depedencies for Linux
-
 You will need to have a working [raylib](https://github.com/raysan5/raylib) installation, consult the ["Working on GNU Linux"](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux) section of the raylib wiki for instructions.
 
 In a terminal, run:
 
     sudo apt install pkgconf
-
     make build
     make run
 

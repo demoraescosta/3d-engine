@@ -3,18 +3,25 @@
 #include <stdio.h>
 
 #include <math.h>
-#include <mem.h>
 
 #include <raylib.h>
 
 #include "viewport.h"
 
-// --------------------
-// matrix stuff
-// --------------------
+// -----------------------------------------------------------------------------
+// vector stuff
+// -----------------------------------------------------------------------------
 
+// scale vec2d by a f32 factor
+void vec2d_scale(vec2d* v, f32 factor);
+
+// multiply vec2d by vec2d
+void vec2d_multiply(vec2d *v, f32 factor);
+
+// takes input (vec3d) i, multiplies it by matrix (mat4x4) m and outputs to buffer (vec3d) o
 void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o)
-{    
+{   
+    // i hate this
     o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] + m->m[3][0];
 	o->y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z * m->m[2][1] + m->m[3][1];
 	o->z = i->x * m->m[0][2] + i->y * m->m[1][2] + i->z * m->m[2][2] + m->m[3][2];
@@ -28,6 +35,9 @@ void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o)
         o->z /= w;
 	}
 }
+// -----------------------------------------------------------------------------
+// matrix stuff
+// -----------------------------------------------------------------------------
 
 // get x-rotation matrix
 mat4x4 matrix_rotation_X(f32 angle)
@@ -77,10 +87,9 @@ mat4x4 matrix_rotation_Z(f32 angle)
 // multiply matrix (mat4x4*) x by matrix (mat4x4*) y and outputs to buffer (mat4x4*) o
 mat4x4 matrix_multiplication(mat4x4* x, mat4x4* y, mat4x4* o);
 
-
-// --------------------
+// -----------------------------------------------------------------------------
 // tri stuff
-// --------------------
+// -----------------------------------------------------------------------------
  
 void tri_print(tri t)
 {
@@ -124,22 +133,6 @@ void tri_scale_v(tri* t, vec3d vector, tri* o)
     }
 }
 
-// void tri_project(tri t, viewport* v, tri* o)
-// {
-//     // mat4x4 projection_matrix = { 0 };
-
-//     // v->projection_matrix.m[0][0] = v->aspect_ratio * v->fov_rad;
-//     // v->projection_matrix.m[1][1] = v->fov_rad;
-//     // v->projection_matrix.m[2][2] = v->far_plane / (v->far_plane - v->near_plane);
-//     // v->projection_matrix.m[3][2] = (-v->far_plane * v->near_plane) / (v->far_plane - v->near_plane);
-//     // v->projection_matrix.m[2][3] = 1.0f;
-//     // v->projection_matrix.m[3][3] = 0.0f;
-
-//     // multiply_vec_by_mat(&t.p[0], pm, &o->p[0]);
-//     // multiply_vec_by_mat(&t.p[1], pm, &o->p[1]);
-//     // multiply_vec_by_mat(&t.p[2], pm, &o->p[2]);
-// }
-
 void tri_project(tri t, viewport *v, tri *o)
 {
     multiply_vec_by_mat(&t.p[0], &v->projection_matrix, &o->p[0]);
@@ -147,6 +140,7 @@ void tri_project(tri t, viewport *v, tri *o)
     multiply_vec_by_mat(&t.p[2], &v->projection_matrix, &o->p[2]);
 }
 
+// REVIEW: may not need this at all
 void tri_rotate_m(tri t, mat4x4* rm, tri* o)
 {
     multiply_vec_by_mat(&t.p[0], rm, &o->p[0]);
@@ -154,8 +148,13 @@ void tri_rotate_m(tri t, mat4x4* rm, tri* o)
     multiply_vec_by_mat(&t.p[2], rm, &o->p[2]);
 }
 
-void tri_rotate_v(tri* t, vec3d rotation_vector, tri* o)
+// TODO: https://en.wikipedia.org/wiki/Rotation_matrix#General_3D_rotations
+#if 0 
+void tri_rotate(tri* t, vec3d rotation_vector, tri* o)
 {
+    // i know that there is a way to make this that's "better" and "simpler".
+    // i don't care, it's up to future me to figure this out later
+
     mat4x4 rotation_mat_y = { 0 };
 
     float angle_x = rotation_vector.x;
@@ -192,6 +191,7 @@ void tri_rotate_v(tri* t, vec3d rotation_vector, tri* o)
         tri_rotate_m(*t, &rotation_mat_z, o);
     }
 }
+#endif
 
 void tri_translate(tri t, vec3d vector, tri* o)
 {
@@ -213,33 +213,33 @@ void tri_translate_xyz(tri t, f32 x, f32 y, f32 z, tri* o)
     }
 }
 
-// ----------
+// -----------------------------------------------------------------------------
 // cube stuff
-// ----------
+// -----------------------------------------------------------------------------
 
 static tri cube_tris[] = 
 {
-	// SOUTH
+	// south
     { 0.5f, 0.0f, 0.0f,    0.0f, 0.5f, 0.0f,    0.5f, 0.5f, 0.0f },
 	{ 0.0f, 0.0f, 0.0f,    0.5f, 0.5f, 0.0f,    0.5f, 0.0f, 0.0f },
 
-	// EAST                                                      
+	// east                                                     
 	{ 0.5f, 0.0f, 0.0f,    0.5f, 0.5f, 0.0f,    0.5f, 0.5f, 0.5f },
 	{ 0.5f, 0.0f, 0.0f,    0.5f, 0.5f, 0.5f,    0.5f, 0.0f, 0.5f },
 
-	// NORTH                                                     
+	// north                                                     
 	{ 0.5f, 0.0f, 0.5f,    0.5f, 0.5f, 0.5f,    0.0f, 0.5f, 0.5f },
 	{ 0.5f, 0.0f, 0.5f,    0.0f, 0.5f, 0.5f,    0.0f, 0.0f, 0.5f },
 
-	// WEST                                                      
+	// west                                                     
 	{ 0.0f, 0.0f, 0.5f,    0.0f, 0.5f, 0.5f,    0.0f, 0.5f, 0.0f },
 	{ 0.0f, 0.0f, 0.5f,    0.0f, 0.5f, 0.0f,    0.0f, 0.0f, 0.0f },
 
-	// TOP                                                       
+	// top                                                      
 	{ 0.0f, 0.5f, 0.0f,    0.0f, 0.5f, 0.5f,    0.5f, 0.5f, 0.5f },
 	{ 0.0f, 0.5f, 0.0f,    0.5f, 0.5f, 0.5f,    0.5f, 0.5f, 0.0f },
 
-	// BOTTOM                                                    
+	// bottom
 	{ 0.5f, 0.0f, 0.5f,    0.0f, 0.0f, 0.5f,    0.0f, 0.0f, 0.0f },
 	{ 0.5f, 0.0f, 0.5f,    0.0f, 0.0f, 0.0f,    0.5f, 0.0f, 0.0f },
 };
