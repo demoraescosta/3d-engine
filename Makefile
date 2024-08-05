@@ -1,9 +1,9 @@
-.PHONY: all clean # idk what this is
+.PHONY: all
 
 PROJ = 3d
 
 # CC = gcc -std=c11
-CC = clang -std=c11 -v 
+CC = clang -std=c11 -v -g
 CFLAGS = -Wall -Wextra -pedantic -c -g \
 		 -Wno-declaration-after-statement \
 		 -Wno-c++98-compat \
@@ -17,12 +17,10 @@ CFLAGS = -Wall -Wextra -pedantic -c -g \
 		 -Wno-unused-includes
 # ------------------------------------------------------------------------------
 # linking
-# ------------------------------------------------------------------------------
 
 # include dir
 CFLAGS += -Iinclude/
 CFLAGS += -Isrc/
-
 
 # libs
 LIBS = raylib
@@ -33,7 +31,6 @@ LFLAGS += -lm
 
 # ------------------------------------------------------------------------------
 # building
-# ------------------------------------------------------------------------------
 
 BUILD_DIR = bin
 SRC_DIR = src
@@ -43,13 +40,14 @@ SOURCES := $(wildcard $(SRC_DIR)/*.c)
 
 OBJ := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 
-ifeq ($(OS), Windows_NT)
+ifeq ($(OS),Windows_NT)
 REMOVE_CMD := del /f /q
 else
 REMOVE_CMD := rm -rf
 endif
 
-all: build compiledb
+
+all: clean build compiledb
 
 build: dir $(BUILD_DIR)/$(EXEC)
 

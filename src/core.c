@@ -10,23 +10,30 @@
 
 // -----------------------------------------------------------------------------
 // vector stuff
-// -----------------------------------------------------------------------------
 
-// scale vec2d by a f32 factor
-void vec2d_scale(vec2d* v, f32 factor);
+// subtract two vectors
+vec3d vec3d_add(vec3d x, vec3d y);
 
-// multiply vec2d by vec2d
-void vec2d_multiply(vec2d *v, f32 factor);
+// subtract two vectors
+vec3d vec3d_sub(vec3d x, vec3d y)
+{
+    return (vec3d) 
+    {
+        .x = x.x - y.x,
+        .y = x.y = y.y,
+        .z = x.z - y.z,
+    };
+}
 
 // takes input (vec3d) i, multiplies it by matrix (mat4x4) m and outputs to buffer (vec3d) o
-void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o)
+void vec3d_mul_mat4x4(vec3d i, mat4x4* m, vec3d* o)
 {   
     // i hate this
-    o->x = i->x * m->m[0][0] + i->y * m->m[1][0] + i->z * m->m[2][0] + m->m[3][0];
-	o->y = i->x * m->m[0][1] + i->y * m->m[1][1] + i->z * m->m[2][1] + m->m[3][1];
-	o->z = i->x * m->m[0][2] + i->y * m->m[1][2] + i->z * m->m[2][2] + m->m[3][2];
+    o->x = i.x * m->m[0][0] + i.y * m->m[1][0] + i.z * m->m[2][0] + m->m[3][0];
+	o->y = i.x * m->m[0][1] + i.y * m->m[1][1] + i.z * m->m[2][1] + m->m[3][1];
+	o->z = i.x * m->m[0][2] + i.y * m->m[1][2] + i.z * m->m[2][2] + m->m[3][2];
 
-	float w = i->x * m->m[0][3] + i->y * m->m[1][3] + i->z * m->m[2][3] + m->m[3][3];
+	float w = i.x * m->m[0][3] + i.y * m->m[1][3] + i.z * m->m[2][3] + m->m[3][3];
 
 	if (w != 0.0f)
 	{
@@ -37,7 +44,6 @@ void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o)
 }
 // -----------------------------------------------------------------------------
 // matrix stuff
-// -----------------------------------------------------------------------------
 
 // get x-rotation matrix
 mat4x4 matrix_rotation_X(f32 angle)
@@ -89,7 +95,6 @@ mat4x4 matrix_multiplication(mat4x4* x, mat4x4* y, mat4x4* o);
 
 // -----------------------------------------------------------------------------
 // tri stuff
-// -----------------------------------------------------------------------------
  
 void tri_print(tri t)
 {
@@ -108,90 +113,60 @@ void tri_print(tri t)
 
 void tri_draw(tri t)
 {
-    DrawLine(t.p[0].x, t.p[0].y, t.p[1].x, t.p[1].y, WHITE);
-    DrawLine(t.p[1].x, t.p[1].y, t.p[2].x, t.p[2].y, WHITE);
-    DrawLine(t.p[2].x, t.p[2].y, t.p[0].x, t.p[0].y, WHITE);
+    // DrawLine(t.p[0].x, t.p[0].y, t.p[1].x, t.p[1].y, WHITE);
+    // DrawLine(t.p[1].x, t.p[1].y, t.p[2].x, t.p[2].y, WHITE);
+    // DrawLine(t.p[2].x, t.p[2].y, t.p[0].x, t.p[0].y, WHITE);
+    
+    DrawTriangleLines((Vector2) { t.p[0].x, t.p[0].y }, 
+                      (Vector2) { t.p[1].x, t.p[1].y }, 
+                      (Vector2) { t.p[2].x, t.p[2].y }, 
+                      WHITE);
 }
 
-void tri_scale(tri* t, f32 factor, tri* o)
+void tri_scale(tri t, f32 factor, tri* o)
 {
     for (uint i = 0; i < 3; i += 1)
     {
-        o->p[0].x = t->p[0].x * factor;
-        o->p[1].y = t->p[1].y * factor;
-        o->p[2].z = t->p[2].z * factor;
+        o->p[0].x = t.p[0].x * factor;
+        o->p[1].y = t.p[1].y * factor;
+        o->p[2].z = t.p[2].z * factor;
     }
 }
 
-void tri_scale_v(tri* t, vec3d vector, tri* o)
+void tri_scale_v(tri t, vec3d vector, tri* o)
 {
     for (uint i = 0; i < 3; i += 1)
     {
-        o->p[i].x = t->p[i].x * vector.x;
-        o->p[i].y = t->p[i].y * vector.y;
-        o->p[i].z = t->p[i].z * vector.z;
+        o->p[i].x = t.p[i].x * vector.x;
+        o->p[i].y = t.p[i].y * vector.y;
+        o->p[i].z = t.p[i].z * vector.z;
     }
 }
 
-void tri_project(tri t, viewport *v, tri *o)
+void tri_project(tri t, viewport v, tri* o)
 {
-    multiply_vec_by_mat(&t.p[0], &v->projection_matrix, &o->p[0]);
-    multiply_vec_by_mat(&t.p[1], &v->projection_matrix, &o->p[1]);
-    multiply_vec_by_mat(&t.p[2], &v->projection_matrix, &o->p[2]);
+    vec3d_mul_mat4x4(t.p[0], &v.projection_matrix, &o->p[0]);
+    vec3d_mul_mat4x4(t.p[1], &v.projection_matrix, &o->p[1]);
+    vec3d_mul_mat4x4(t.p[2], &v.projection_matrix, &o->p[2]);
 }
 
 // REVIEW: may not need this at all
 void tri_rotate_m(tri t, mat4x4* rm, tri* o)
 {
-    multiply_vec_by_mat(&t.p[0], rm, &o->p[0]);
-    multiply_vec_by_mat(&t.p[1], rm, &o->p[1]);
-    multiply_vec_by_mat(&t.p[2], rm, &o->p[2]);
+    vec3d_mul_mat4x4(t.p[0], rm, &o->p[0]);
+    vec3d_mul_mat4x4(t.p[1], rm, &o->p[1]);
+    vec3d_mul_mat4x4(t.p[2], rm, &o->p[2]);
 }
 
 // TODO: https://en.wikipedia.org/wiki/Rotation_matrix#General_3D_rotations
-#if 0 
 void tri_rotate(tri* t, vec3d rotation_vector, tri* o)
 {
-    // i know that there is a way to make this that's "better" and "simpler".
-    // i don't care, it's up to future me to figure this out later
+    (void) t;
+    (void) rotation_vector;
+    (void) o;
 
-    mat4x4 rotation_mat_y = { 0 };
-
-    float angle_x = rotation_vector.x;
-    float angle_y = rotation_vector.y;
-    float angle_z = rotation_vector.z;
-
-    // rotation on the x axis
-    if (angle_x != 0.0f)
-    {
-        mat4x4 rotation_mat_x = { 0 };
-
-        rotation_mat_x.m[0][0] = 1;
-        rotation_mat_x.m[1][1] = cosf(angle_x * 0.5f);
-        rotation_mat_x.m[1][2] = sinf(angle_x * 0.5f);
-        rotation_mat_x.m[2][1] = -sinf(angle_x * 0.5f);
-        rotation_mat_x.m[2][2] = cosf(angle_x * 0.5f);
-        rotation_mat_x.m[3][3] = 1;
-
-        tri_rotate_m(*t, &rotation_mat_x, o);
-    }
-
-    // rotation on the z axis
-    if (angle_z != 0.0f)
-    {
-        mat4x4 rotation_mat_z = { 0 };
-
-        rotation_mat_z.m[0][0] = cosf(angle_z);
-		rotation_mat_z.m[0][1] = sinf(angle_z);
-		rotation_mat_z.m[1][0] = -sinf(angle_z);
-		rotation_mat_z.m[1][1] = cosf(angle_z);
-		rotation_mat_z.m[2][2] = 1;
-		rotation_mat_z.m[3][3] = 1;
-
-        tri_rotate_m(*t, &rotation_mat_z, o);
-    }
+    return;    
 }
-#endif
 
 void tri_translate(tri t, vec3d vector, tri* o)
 {
@@ -211,11 +186,25 @@ void tri_translate_xyz(tri t, f32 x, f32 y, f32 z, tri* o)
         o->p[i].y = t.p[i].y + y;
         o->p[i].z = t.p[i].z + z;
     }
+    
 }
+
+vec3d tri_normal(tri t)
+{
+    // this is super cool 
+
+    vec3d u = vec3d_sub(t.p[1], t.p[0]); // edge 1
+    vec3d v = vec3d_sub(t.p[2], t.p[1]); // edge 2
+
+    return (vec3d)
+    {
+        .x = 0,
+    };
+}
+
 
 // -----------------------------------------------------------------------------
 // cube stuff
-// -----------------------------------------------------------------------------
 
 static tri cube_tris[] = 
 {
@@ -269,7 +258,7 @@ void _mesh_print(mesh m, const char* mesh_name)
     }
 }
 
-void mesh_render(mesh* mesh, viewport* v)
+void mesh_render(mesh* mesh, viewport v)
 {
     for (size_t i = 0; i < mesh->tri_count; i++)
     {

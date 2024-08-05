@@ -37,7 +37,6 @@ int main(int argc, char** argv)
 
     // -------------------------------------------------------------------------
     // rendering
-    // -------------------------------------------------------------------------
 
     // RenderTexture2D target = LoadRenderTexture(scr_width, scr_height);
 
@@ -60,7 +59,6 @@ int main(int argc, char** argv)
         
         // ---------------------------------------------------------------------
         // drawing
-        // ---------------------------------------------------------------------
 
         bool show_debug = false;
 
@@ -93,12 +91,12 @@ int main(int argc, char** argv)
                 tri_translate_xyz(t, 0, 0, 2.0f, &t);
 
                 // projection
-                tri_project(t, &v, &tri_projected);
+                tri_project(t, v, &tri_projected);
 
                 // scale cube
                 tri_translate_xyz(tri_projected, 1.0f, 1.0f, 0.0f, &tri_projected);
 
-                tri_scale_v(&tri_projected, 
+                tri_scale_v(tri_projected, 
                             (vec3d) 
                             { 
                                 .x = 0.5f * (float)scr_width, 

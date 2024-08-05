@@ -31,75 +31,52 @@ typedef struct viewport viewport;
 
 // -----------------------------------------------------------------------------
 // vector stuff
-// -----------------------------------------------------------------------------
 
-// scale vec2d by a f32 factor
-void vec2d_scale(vec2d* v, f32 factor);
 
-// multiply vec2d by vec2d
-void vec2d_multiply(vec2d *v, f32 factor);
-
-// takes input (vec3d) i, multiplies it by matrix (mat4x4) m and outputs to buffer (vec3d) "o"
-void multiply_vec_by_mat(vec3d* i, mat4x4* m, vec3d* o);
+vec3d vec3d_add(vec3d x, vec3d y); // subtract two vectors and return new vector
+vec3d vec3d_sub(vec3d x, vec3d y); // subtract two vectors and return new vector
+vec3d vec3d_sub(vec3d x, vec3d y); // subtract two vectors
+void vec3d_mul_mat4x4(vec3d i, mat4x4* m, vec3d* o); // takes input multiplies it by matrix and outputs to buffer "o"
 
 // -----------------------------------------------------------------------------
 // matrix stuff
-// -----------------------------------------------------------------------------
+
 typedef struct mat4x4
 {
     f64 m[4][4];
 } mat4x4;
 
-// generate x-rotation matrix
-mat4x4 matrix_rotation_X(f32 angle); 
+mat4x4 matrix_rotation_X(f32 angle); // generate x-rotation matrix
+mat4x4 matrix_rotation_Y(f32 angle); // generate y-rotation matrix
+mat4x4 matrix_rotation_Z(f32 angle); // generate z-rotation matrix
 
-// generate y-rotation matrix
-mat4x4 matrix_rotation_Y(f32 angle);
-
-// generate z-rotation matrix
-mat4x4 matrix_rotation_Z(f32 angle);
-
-// multiply matrix (mat4x4*) x by matrix (mat4x4*) y and outputs to buffer (mat4x4*) o
-mat4x4 matrix_multiplication(mat4x4* x, mat4x4* y, mat4x4* o);
+mat4x4 matrix_multiplication(mat4x4* x, mat4x4* y, mat4x4* o); // multiply matrix (mat4x4*) x by matrix y and outputs to buffer o
 
 // -----------------------------------------------------------------------------
 // tri stuff
-// -----------------------------------------------------------------------------
 
 typedef struct tri
 {
     vec3d p[3]; // points
 } tri;
 
+// rendering
+
 void tri_print(tri t);
 void tri_draw(tri t);
 
-// scale triangle by "factor" (f32) and outputs the scaled triangle into tri (tri*) "o"
-void tri_scale(tri* t, f32 factor, tri* o);
+// operations
 
-// scale triangle using a "vector" for each position and outputs the scaled triangle into tri (tri*) "o"
-void tri_scale_v(tri* t, vec3d vector, tri* o);
-
-// flattens triangle "t" (tri) using viewport "v" (viewport*) data and outputs the
-// projected triangle into tri (tri*) "o"
-void tri_project(tri t, viewport* v, tri* o);
-
-// this is temporary, will replace with an actual rotation function later™
-void tri_rotate_m(tri t, mat4x4* rm, tri* o);
-
-// this is temporary, will replace with an actual rotation function later™
-void tri_rotate_m(tri t, mat4x4* rm, tri* o);
-
-// translate by vector (vec3d) and outputs the translated triangle into tri (tri*) "o"
-void tri_translate(tri t, vec3d vector, tri* o);
-
-// translate triangle "t" (tri) by specified coordinates (f32) and outputs the 
-// translated triangle into tri (tri*) "o" 
-void tri_translate_xyz(tri t, f32 x, f32 y, f32 z, tri* o);
+void tri_scale(tri t, f32 factor, tri* o); // scale triangle by "factor" (f32) and outputs the scaled triangle into tri (tri*) "o"
+void tri_scale_v(tri t, vec3d vector, tri* o); // scale triangle by vetor and outputs the scaled triangle into &o
+void tri_project(tri t, viewport v, tri* o); // projects and draws triangle t, calls tri_draw
+void tri_rotate_m(tri t, mat4x4* rm, tri* o); // this is temporary, will replace with an actual rotation function later™
+void tri_translate(tri t, vec3d vector, tri* o); // UNIMPLEMENTED: translate by vector (vec3d) and outputs the translated triangle into tri (tri*) "o"
+void tri_translate_xyz(tri t, f32 x, f32 y, f32 z, tri* o); // translate triangle "t" (tri) by specified coordinates (f32) and outputs the  // translated triangle into tri (tri*) "o" 
+vec3d tri_normal(tri t); // get normal of tri
 
 // -----------------------------------------------------------------------------
 // mesh stuff
-// -----------------------------------------------------------------------------
 
 typedef struct mesh 
 {
@@ -107,14 +84,13 @@ typedef struct mesh
     size_t tri_count;
 } mesh;
 
-// internal: prints every tri's x, y, z position of given mesh "mesh"
-void _mesh_print(mesh mesh, const char* mesh_name);
-mesh mesh_cube(void);
 
-void mesh_scale(mesh* m, f32 factor);
+void _mesh_print(mesh mesh, const char* mesh_name); // internal: prints every tri's x, y, z position of given mesh "mesh"
+#define mesh_print(m) _mesh_print(m, #m) // prints every tri's x, y, z position of given mesh "m"
 
-// render mesh to viewport (viewport*) "v"
-void mesh_render(mesh* mesh, viewport* v);
+mesh mesh_cube(void); // generates sample cube
+void mesh_scale(mesh* m, f32 factor); // scales mesh in all directions by factor
 
-// prints every tri's x, y, z position of given mesh (mesh) "m"
-#define mesh_print(m) _mesh_print(m, #m)
+void mesh_render(mesh* mesh, viewport v); // render mesh to viewport (viewport*) "v"
+
+
