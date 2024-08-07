@@ -2,8 +2,8 @@
 // #include <stdlib.h>
 // #include <stdio.h>
 
-#include <math.h>
 #include <raylib.h>
+#include <stdio.h>
 
 #include "core.h"
 #include "viewport.h"
@@ -14,19 +14,31 @@ int main(int argc, char** argv)
 
     const char* dir = GetWorkingDirectory();
 
-    const u32 scr_width = 1200;
-    const u32 scr_height = 800;
 
-    const f32 scr_scale = 0.5f;
+    // const u32 scr_width  = 1920;
+    // const u32 scr_height = 1080;
+
+    u32 scr_width  = 1920;
+    u32 scr_height = 1080;
+
+    // const f32 scr_scale = 0.5f;
 
     InitWindow(scr_width, scr_height, "3d renderer");
 
     const mesh test_cube = mesh_cube();
     mesh_print(test_cube);
 
+    int monitor_id = GetCurrentMonitor();
+
+    int monitor_width = GetMonitorWidth(monitor_id);
+    int monitor_height = GetMonitorHeight(monitor_id);
+
+    int monitor_refresh_rate = GetMonitorRefreshRate(monitor_id);
+
+    printf("%d / %d, m = %d, rs = %d\n", monitor_width, monitor_height, monitor_id, monitor_refresh_rate);
+
     f32 fov = 90.0f;
     f32 aspect_ratio = (f32)scr_height / (f32)scr_width;
-    f32 fov_rad = (1.0f / tanf(fov * 0.5f / 180.0f * PI));
     
     f32 far_plane  = 1000.0f;
     f32 near_plane =   0.10f;
@@ -54,25 +66,40 @@ int main(int argc, char** argv)
         f32 angle = 1.0f * elapsed_time;
 
         float mwheel = (float)(GetMouseWheelMove()*2.0f);
-
-        v.fov -= mwheel;
+        if (v.fov - mwheel > 0)
+            v.fov -= mwheel;    
         
         // ---------------------------------------------------------------------
         // drawing
 
-        bool show_debug = false;
+        bool show_debug = true;
 
         BeginDrawing();
             ClearBackground(BLACK);
 
             // debug data
 
-            draw_text(TextFormat("fps: %d", GetFPS()),   16, 16, 16, WHITE);
-            draw_text(TextFormat("%.2fs", elapsed_time),  16, 32, 16, WHITE);
-            draw_text(TextFormat("ft: %.2fms", dt*1000), 16, 48, 16, WHITE);
-            draw_text(TextFormat("viewport data:\n fov: %.1f\n fov rad: %.1f \n near plane: %.2f \n far plane: %.2f", 
-                                  v.fov, v.fov_rad, v.near_plane, v.far_plane), 
-                                  16, 96, 16, WHITE);
+            const char* debug_info = "viewport data:\n fov: %.1f\n fov rad: %.1f \n near plane: %.2f \n far plane: %.2f";
+
+            if (show_debug)
+            {
+                draw_text(TextFormat("fps: %d", GetFPS()),   
+                          16, 16, // x, y
+                          16, WHITE);
+                draw_text(TextFormat("%.2fs", elapsed_time),  
+                          16, 32, 
+                          16, WHITE);
+                draw_text(TextFormat("ft: %.2fms", dt*1000), 
+                          16, 48, 
+                          16, WHITE);
+                draw_text(TextFormat(debug_info, v.fov, v.fov_rad, v.near_plane, v.far_plane), 
+                          16, 96, 
+                          16, WHITE);
+                draw_text(TextFormat("monitor data: %d / %d, m_id = %d, rs = %d", monitor_width, monitor_height, monitor_id, monitor_refresh_rate),
+                          16, 0, 
+                          16, WHITE);
+            }
+
 
             // draw cube mesh
             for (size_t i = 0; i < test_cube.tri_count; i++)
