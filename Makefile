@@ -12,9 +12,7 @@ CFLAGS = -Wall -Wextra -pedantic -c -g \
 		 -Wno-c23-compat \
 		 -Wno-reserved-identifier \
 		 -Wno-missing-braces \
-		 -Wno-unused-variable \
 		 -Wno-sizeof-pointer-div \
-		 -Wno-unused-includes
 # ------------------------------------------------------------------------------
 # linking
 
