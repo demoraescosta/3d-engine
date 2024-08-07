@@ -12,35 +12,57 @@
 // vector stuff
 
 // subtract two vectors
-vec3d vec3d_add(vec3d x, vec3d y);
+vec3d vec3d_add(vec3d x, vec3d y)
+{
+    return (vec3d) 
+    {
+        .x = x.x + y.x,
+        .y = x.y + y.y,
+        .z = x.z + y.z,
+    };
+}
 
 // subtract two vectors
-vec3d vec3d_sub(vec3d x, vec3d y)
+vec3d vec3d_min(vec3d x, vec3d y)
 {
     return (vec3d) 
     {
         .x = x.x - y.x,
-        .y = x.y = y.y,
+        .y = x.y - y.y,
         .z = x.z - y.z,
     };
 }
 
+// subtract two vectors
+vec3d vec3d_scale(vec3d v, f32 factor)
+{
+    return (vec3d) 
+    {
+        .x = v.x * factor,
+        .y = v.y * factor,
+        .z = v.z * factor,
+    };
+}
+
 // takes input (vec3d) i, multiplies it by matrix (mat4x4) m and outputs to buffer (vec3d) o
-void vec3d_mul_mat4x4(vec3d i, mat4x4* m, vec3d* o)
+vec3d vec3d_mul_mat4x4(vec3d i, mat4x4* m)
 {   
-    // i hate this
-    o->x = i.x * m->m[0][0] + i.y * m->m[1][0] + i.z * m->m[2][0] + m->m[3][0];
-	o->y = i.x * m->m[0][1] + i.y * m->m[1][1] + i.z * m->m[2][1] + m->m[3][1];
-	o->z = i.x * m->m[0][2] + i.y * m->m[1][2] + i.z * m->m[2][2] + m->m[3][2];
+    vec3d o;
+    
+    o.x = i.x * m->m[0][0] + i.y * m->m[1][0] + i.z * m->m[2][0] + m->m[3][0];
+	o.y = i.x * m->m[0][1] + i.y * m->m[1][1] + i.z * m->m[2][1] + m->m[3][1];
+	o.z = i.x * m->m[0][2] + i.y * m->m[1][2] + i.z * m->m[2][2] + m->m[3][2];
 
 	float w = i.x * m->m[0][3] + i.y * m->m[1][3] + i.z * m->m[2][3] + m->m[3][3];
 
 	if (w != 0.0f)
 	{
-		o->x /= w; 
-        o->y /= w; 
-        o->z /= w;
+		o.x /= w; 
+        o.y /= w; 
+        o.z /= w;
 	}
+
+    return o;
 }
 // -----------------------------------------------------------------------------
 // matrix stuff
@@ -145,18 +167,11 @@ void tri_scale_v(tri t, vec3d vector, tri* o)
 
 void tri_project(tri t, viewport v, tri* o)
 {
-    vec3d_mul_mat4x4(t.p[0], &v.projection_matrix, &o->p[0]);
-    vec3d_mul_mat4x4(t.p[1], &v.projection_matrix, &o->p[1]);
-    vec3d_mul_mat4x4(t.p[2], &v.projection_matrix, &o->p[2]);
+    o->p[0] = vec3d_mul_mat4x4(t.p[0], &v.projection_matrix);
+    o->p[1] = vec3d_mul_mat4x4(t.p[1], &v.projection_matrix);
+    o->p[2] = vec3d_mul_mat4x4(t.p[2], &v.projection_matrix);
 }
 
-// REVIEW: may not need this at all
-void tri_rotate_m(tri t, mat4x4* rm, tri* o)
-{
-    vec3d_mul_mat4x4(t.p[0], rm, &o->p[0]);
-    vec3d_mul_mat4x4(t.p[1], rm, &o->p[1]);
-    vec3d_mul_mat4x4(t.p[2], rm, &o->p[2]);
-}
 
 // TODO: https://en.wikipedia.org/wiki/Rotation_matrix#General_3D_rotations
 void tri_rotate(tri* t, vec3d rotation_vector, tri* o)
@@ -165,7 +180,7 @@ void tri_rotate(tri* t, vec3d rotation_vector, tri* o)
     (void) rotation_vector;
     (void) o;
 
-    return;    
+    return;
 }
 
 void tri_translate(tri t, vec3d vector, tri* o)
@@ -189,16 +204,25 @@ void tri_translate_xyz(tri t, f32 x, f32 y, f32 z, tri* o)
     
 }
 
+// REVIEW: may not need this at all 
+void tri_rotate_m(tri t, mat4x4* rm, tri* o)
+{
+    o->p[0] = vec3d_mul_mat4x4(t.p[0], rm);
+    o->p[1] = vec3d_mul_mat4x4(t.p[1], rm);
+    o->p[2] = vec3d_mul_mat4x4(t.p[2], rm);
+}
+
+// get normal of tri
 vec3d tri_normal(tri t)
 {
-    // this is super cool 
+    vec3d u = vec3d_min(t.p[1], t.p[0]); // edge 1
+    vec3d v = vec3d_min(t.p[2], t.p[1]); // edge 2
 
-    vec3d u = vec3d_sub(t.p[1], t.p[0]); // edge 1
-    vec3d v = vec3d_sub(t.p[2], t.p[1]); // edge 2
-
-    return (vec3d)
+    return (vec3d) // normal
     {
-        .x = 0,
+        .x = (u.y * v.z) - (u.z * v.y),
+        .y = (u.z * v.x) - (u.x * v.z),
+        .z = (u.x * v.y) - (u.y * v.x),
     };
 }
 
