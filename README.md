@@ -28,7 +28,7 @@ In an [MSYS2](https://www.msys2.org/) UCRT64 terminal, run:
     pacman -S mingw-w64-ucrt-x86_64-raylib
     pacman -S pkgconf
 
-In a Powershell terminal with [administrator privileges](https://github.com/gerardog/gsudo), run:
+In a Powershell terminal, run:
 
     make build 
     make run
