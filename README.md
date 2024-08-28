@@ -2,7 +2,7 @@
 
 ![cube!](./sample.png)
 
-This is supposed to be a fairly simple implementation of a 3d renderer in C using the [raylib](https://github.com/raysan5/raylib) library.
+This is supposed to be a fairly simple implementation of a 3D renderer in C using the [raylib](https://github.com/raysan5/raylib) library.
 
 Very much unfinished and weird.
 
