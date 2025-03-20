@@ -37,4 +37,4 @@ In a terminal, run:
     make build
     make run
 
-Alternatively, ```make all``` will also generate a ```compile_commands.json``` file that can be used by a [clangd](https://clangd.llvm.org/) language server. ```make compiledb``` will generate the same file without building the application. This behaviour requires [compiledb].(https://github.com/nickdiego/compiledb).
+Alternatively, ```make all``` will also generate a ```compile_commands.json``` file that can be used by a [clangd](https://clangd.llvm.org/) language server. ```make compiledb``` will generate the same file without building the application. This behaviour requires [compiledb](https://github.com/nickdiego/compiledb).
