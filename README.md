@@ -2,34 +2,26 @@
 
 ![cube!](./sample.png)
 
-This is supposed to be a fairly simple implementation of a 3D renderer in C using the [raylib](https://github.com/raysan5/raylib) library.
-
-Very much unfinished and weird.
+This is a fairly simple implementation of a 3D renderer in C using [raylib](https://github.com/raysan5/raylib).
 
 ## Depedencies
 
 ### Required
 
-- [raylib](https://github.com/raysan5/raylib) for practically everything
-- [pkgconf](https://github.com/pkgconf/pkgconf) for compiler and linker flags
-
-### Optional
-
-- [compiledb](https://github.com/nickdiego/compiledb) for linting.
+- [raylib](https://github.com/raysan5/raylib)
 
 ## Building for Windows
 
-This guide assumes an [MSYS2](https://www.msys2.org/) UCRT64 environment.
+This guide assumes an [MSYS2](https://www.msys2.org/) environment.
 
 ### Installing depedencies for Windows
 
 In an [MSYS2](https://www.msys2.org/) UCRT64 terminal, run:
 
-    pacman -S mingw-w64-ucrt-x86_64-raylib
     pacman -S pkgconf
 
 In a Powershell terminal, run:
-
+    
     make build 
     make run
 
@@ -45,4 +37,4 @@ In a terminal, run:
     make build
     make run
 
-Alternatively, ```make all``` will also generate a ```compile_commands.json``` file that can be used by a [clangd](https://clangd.llvm.org/) language server. ```make compiledb``` will generate the same file without building the application. This behaviour requires [compiledb](https://github.com/nickdiego/compiledb).
+Alternatively, ```make all``` will also generate a ```compile_commands.json``` file that can be used by a [clangd](https://clangd.llvm.org/) language server. ```make compiledb``` will generate the same file without building the application. This behaviour requires [compiledb].(https://github.com/nickdiego/compiledb).
